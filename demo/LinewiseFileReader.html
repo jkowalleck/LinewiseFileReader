@@ -1,0 +1,48 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<script type="text/javascript" src="../LinewiseFileReader.js"></script>
+	<script type="text/javascript">
+	//<![CDATA[
+		function read50lines (file) 
+		{
+		
+			var lineOut = document.getElementById("lines");
+			
+			var limit = 50;
+			
+			var reader = new LinewiseFileReader(file);
+			reader.onload = function (load) 
+			{
+				return this.lines.length < limit;
+			};
+			reader.onloadend = function (loadend) 
+			{
+				var lines = this.lines , lineCount = lines.length;
+				var linesHTML = "<h2>"+ (loadend.loaded < loadend.total ? "first "+ lineCount : "" ) +" lines from file</h2><ol>";
+				for ( var l=0 ; l < lineCount ; ++l )
+				{
+					linesHTML += "<li>"+ lines[l] +"</li>";
+				}				
+				
+				lineOut.innerHTML = linesHTML +"</ol>";
+			};
+			
+			lineOut.innerHTML = "loading&hellip;";
+			
+			reader.read();
+		};
+	//]]>
+	</script>
+</head>
+<body>
+	<h1>LinewiseFileReader demo</h1>
+	
+	<h2></h2>
+	<input type="file" onchange="read50lines(this.files[0])" />
+	
+	<br /><hr />
+	
+	<div id="lines">!! select a file !!</div>
+</body>
+</html>
