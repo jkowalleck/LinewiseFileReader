@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<script type="text/javascript" src="../LinewiseFileReader.js"></script>
+	<script type="text/javascript" src="../../LinewiseFileReader.js"></script>
 	<script type="text/javascript">
 	//<![CDATA[
 		function read50lines (file) 
@@ -12,12 +12,20 @@
 			var limit = 50;
 			
 			var reader = new LinewiseFileReader();
+			reader.onerror = function (error) 
+			{
+				console.info("onload", error);
+				alert("ERROR - see console");
+			};
 			reader.onload = function (load) 
 			{
+				console.info("onload", load);
 				return this.lines.length < limit;
 			};
 			reader.onloadend = function (loadend) 
 			{
+				console.info("onloadend", loadend);
+				
 				var lines = this.lines.slice(0, limit) , lineCount = lines.length;
 				var linesHTML = "<h2>"+ (loadend.loaded < loadend.total ? "first "+ lineCount : "" ) +" lines from file</h2><ol>";
 				for ( var l=0 ; l < lineCount ; ++l )
