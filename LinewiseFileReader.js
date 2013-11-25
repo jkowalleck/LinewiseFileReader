@@ -14,6 +14,7 @@ LinewiseFileReader.prototype = {
 
 	reset : function ()
 	{
+		this.error = null;
 		this.lines = [];
 	} ,
 
