@@ -4,9 +4,8 @@
  * @author jan Kowalleck <jan.kowalleck@googlemail.com>
  */
  
-LinewiseFileReader = function (file)
+LinewiseFileReader = function ()
 {
-	this.file = file;
 	this.reset();
 };
 
@@ -18,11 +17,10 @@ LinewiseFileReader.prototype = {
 		this.lines = [];
 	} ,
 	
-	read : function ()
-	{
-		var linewiseFileReader = this;
+	lineSplitRE : /\r?\n/ ,
 	
-		var file = linewiseFileReader.file;
+	read : function (file)
+	{
 		if ( ! file ) 
 		{ 
 			throw new Error("noFile");
@@ -33,8 +31,11 @@ LinewiseFileReader.prototype = {
 		{
 			throw new Error("fileEmpty");
 		}		
+	
+		var linewiseFileReader = this;
+		linewiseFileReader.reset();
 		
-		var reader = new FileReader();
+		var reader = new FileReader(); 
 		
 		var chunkStart = 0;
 		var chunkSize = 1024 * 100; // 100 KB
@@ -53,12 +54,13 @@ LinewiseFileReader.prototype = {
 				});
 		};
 		
+		var lineSplitRE = this.lineSplitRE;
 		var lastChunkRest = "";
 		reader.onloadend = function (loadend)
 		{
 			var reader = this;
 
-			var chunkLines = (lastChunkRest + reader.result).split(/[\r\n]+/);
+			var chunkLines = (lastChunkRest + reader.result).split(lineSplitRE);
 			lastChunkRest = chunkLines.pop();
 			linewiseFileReader.lines = linewiseFileReader.lines.concat(chunkLines);
 

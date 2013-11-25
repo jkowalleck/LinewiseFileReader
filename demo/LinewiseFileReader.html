@@ -11,7 +11,7 @@
 			
 			var limit = 50;
 			
-			var reader = new LinewiseFileReader(file);
+			var reader = new LinewiseFileReader();
 			reader.onload = function (load) 
 			{
 				return this.lines.length < limit;
@@ -30,7 +30,7 @@
 			
 			lineOut.innerHTML = "loading&hellip;";
 			
-			reader.read();
+			reader.read(file);
 		};
 	//]]>
 	</script>
