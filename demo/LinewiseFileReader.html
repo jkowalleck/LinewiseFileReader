@@ -18,7 +18,7 @@
 			};
 			reader.onloadend = function (loadend) 
 			{
-				var lines = this.lines , lineCount = lines.length;
+				var lines = this.lines.slice(0, limit) , lineCount = lines.length;
 				var linesHTML = "<h2>"+ (loadend.loaded < loadend.total ? "first "+ lineCount : "" ) +" lines from file</h2><ol>";
 				for ( var l=0 ; l < lineCount ; ++l )
 				{
