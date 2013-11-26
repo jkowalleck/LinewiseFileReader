@@ -43,16 +43,21 @@ LinewiseFileReader.prototype = {
 		linewiseFileReader.reset();
 
 		var chunkStart = 0;
-		var getProgress = function (type)
+		var getProgress = function (type, offset)
 		{
 			return new ProgressEvent(type, {
 				  lengthComputable : true
-				, loaded : chunkStart
+				, loaded : chunkStart + ( offset || 0 )
 				, total : file_size
 				});
 		};
 
 		var reader = new FileReader();
+		
+		reader.onload = function (load) 
+		{
+			linewiseFileReader.onload && linewiseFileReader.onload(getProgress("load", load.loaded));
+		};
 
 		var lastChunkRest = "";
 		reader.onloadend = function (loadend)
