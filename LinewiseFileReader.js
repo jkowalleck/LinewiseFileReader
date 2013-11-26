@@ -19,6 +19,10 @@ LinewiseFileReader.prototype = {
 	} ,
 
 	lineSplitRE : /\r?\n/ ,
+	splitLines : function (string)
+	{	
+		return string.split(this.lineSplitRE);
+	} ,
 
 	bufferSize :  6241 *  (/* fileEncoding warrant > */ 6 * 7 * 32 ) , // get 6bit, 7bit, 8bit, 16bit and 32bit encodings read correctly
 
@@ -50,7 +54,6 @@ LinewiseFileReader.prototype = {
 
 		var reader = new FileReader();
 
-		var lineSplitRE = linewiseFileReader.lineSplitRE;
 		var lastChunkRest = "";
 		reader.onloadend = function (loadend)
 		{
@@ -66,7 +69,7 @@ LinewiseFileReader.prototype = {
 			{
 				var reader = this;
 
-				var chunkLines = (lastChunkRest + reader.result).split(lineSplitRE);
+				var chunkLines = linewiseFileReader.splitLines(lastChunkRest + reader.result);
 				chunkStart += loadend.loaded;
 
 				var notDone = ( chunkStart < file_size );
@@ -78,7 +81,6 @@ LinewiseFileReader.prototype = {
 				linewiseFileReader.lines = linewiseFileReader.lines.concat(chunkLines);
 
 				var abort = ( linewiseFileReader.onload && linewiseFileReader.onload(getProgress("load"))===false );
-				console.info(abort , notDone , chunkStart , file_size);
 				if ( !abort && notDone )
 				{
 					linewiseFileReader.readChunk(reader, file, chunkStart);
