@@ -65,7 +65,7 @@ LinewiseFileReader.prototype = {
 
 			if ( this.error )
 			{
-				linewiseFileReader,error = this.error;
+				linewiseFileReader.error = this.error;
 				linewiseFileReader.onerror && linewiseFileReader.onerror(getProgress("error"));
 			}
 			else
