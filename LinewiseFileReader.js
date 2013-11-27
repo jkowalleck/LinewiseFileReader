@@ -4,30 +4,31 @@
  * @author jan Kowalleck <jan.kowalleck@googlemail.com>
  */
 
-LinewiseFileReader = function ()
-{
+LinewiseFileReader = function ( bufferSize ) {
 	this.reset();
+
+	bufferSize && this.setBufferSize(bufferSize);
 };
 
 LinewiseFileReader.prototype = {
 	constructor : LinewiseFileReader ,
 
-	reset : function ()
-	{
+	reset : function () {
 		this.error = null;
 		this.lines = [];
 	} ,
 
-	lineSplitRE : /\r?\n/ ,
-	splitLines : function (string)
-	{	
+	lineSplitRE : /\r\n|\n|\r/ ,
+	splitLines : function (string) {
 		return string.split(this.lineSplitRE);
 	} ,
 
-	bufferSize :  6241 *  (/* fileEncoding warrant > */ 6 * 7 * 32 ) , // get 6bit, 7bit, 8bit, 16bit and 32bit encodings read correctly
+	bufferSize : 1024 * 1024 , // 1 MByte
+	setBufferSize : function (bufferSize) {
+		this.bufferSize = Math.max(1024, bufferSize);
+	} ,
 
-	read : function (file)
-	{
+	read : function (file) {
 		if ( ! file )
 		{
 			throw new Error("noFile");
@@ -43,8 +44,7 @@ LinewiseFileReader.prototype = {
 		linewiseFileReader.reset();
 
 		var chunkStart = 0;
-		var getProgress = function (type, offset)
-		{
+		var getProgress = function (type, offset) {
 			return new ProgressEvent(type, {
 				  lengthComputable : true
 				, loaded : chunkStart + ( offset || 0 )
@@ -53,15 +53,13 @@ LinewiseFileReader.prototype = {
 		};
 
 		var reader = new FileReader();
-		
-		reader.onload = function (load) 
-		{
+
+		reader.onload = function (load) {
 			linewiseFileReader.onload && linewiseFileReader.onload(getProgress("load", load.loaded));
 		};
 
-		var lastChunkRest = "";
-		reader.onloadend = function (loadend)
-		{
+		var lastTrailingOpenLine = "";
+		reader.onloadend = function (loadend) {
 			// trigger onerror, onabort OR onload
 			// and in the end: trigger onloadend
 
@@ -74,14 +72,14 @@ LinewiseFileReader.prototype = {
 			{
 				var reader = this;
 
-				var chunkLines = linewiseFileReader.splitLines(lastChunkRest + reader.result);
+				var chunkLines = linewiseFileReader.splitLines(lastTrailingOpenLine + reader.result);
 				chunkStart += loadend.loaded;
 
 				var notDone = ( chunkStart < file_size );
 
 				if ( notDone )
 				{
-					lastChunkRest = chunkLines.pop();
+					lastTrailingOpenLine = chunkLines.pop();
 				}
 				linewiseFileReader.lines = linewiseFileReader.lines.concat(chunkLines);
 
@@ -99,8 +97,7 @@ LinewiseFileReader.prototype = {
 		this.readChunk(reader, file, chunkStart);
 	} ,
 
-	readChunk : function (reader, file, start)
-	{
+	readChunk : function (reader, file, start) {
 		var blob = file.slice(start, start+this.bufferSize);
 		reader.readAsText(blob);
 	} ,
