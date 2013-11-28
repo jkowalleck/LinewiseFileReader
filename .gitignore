@@ -1,3 +1,5 @@
 test/jasmine*/
 test/demo/
 test/files/
+test/TODO.txt
+test/result.json
